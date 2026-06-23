@@ -111,7 +111,7 @@
                 <i class="ti ti-chevron-down chevron-icon d-none d-md-inline-block"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-md border-0 mt-2 py-2" aria-labelledby="profileDropdown">
-                <li><a class="dropdown-item text-xs py-2 d-flex align-items-center gap-2" href="#"><i class="ti ti-user text-muted fs-6"></i> My Profile</a></li>
+                <li><a class="dropdown-item text-xs py-2 d-flex align-items-center gap-2" href="<?php echo BASE_URL; ?>modules/school/profile/index.php"><i class="ti ti-user text-muted fs-6"></i> My Profile</a></li>
                 <li><a class="dropdown-item text-xs py-2 d-flex align-items-center gap-2" href="#"><i class="ti ti-settings text-muted fs-6"></i> Account Settings</a></li>
                 <li>
                     <hr class="dropdown-divider">

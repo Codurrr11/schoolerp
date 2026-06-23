@@ -96,12 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const targetSelector = this.getAttribute("href");
         const targetEl = document.querySelector(targetSelector);
         if (targetEl) {
-          // Initialize and show the Bootstrap Collapse submenu
-          setTimeout(() => {
-            const bsCollapse = new bootstrap.Collapse(targetEl, {
-              toggle: true,
-            });
-          }, 250); // Delay slightly to allow the sidebar width transition to complete smoothly
+          // Initialize and show the Bootstrap Collapse submenu if not already open
+          if (!targetEl.classList.contains("show")) {
+            setTimeout(() => {
+              const bsCollapse = new bootstrap.Collapse(targetEl, {
+                toggle: true,
+              });
+            }, 250); // Delay slightly to allow the sidebar width transition to complete smoothly
+          }
         }
       }
     });
@@ -934,6 +936,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const data = res.data;
 
               document.getElementById("edit_student_id").value = data.id || "";
+              document.getElementById("edit_status").value = data.status || "active";
               document.getElementById("edit_apaar_id").value =
                 data.apaar_id || "";
               document.getElementById("edit_pen_no").value = data.pen_no || "";
@@ -2714,4 +2717,264 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.body.classList.contains("admission-print-view")) {
     window.print();
   }
+
+  // ==========================================
+  // STUDENT MIGRATIONS MODULE LOGIC
+  // ==========================================
+  const migrateFromSession = document.getElementById("migrate_from_session");
+  const migrateFromClass = document.getElementById("migrate_from_class");
+  const migrateFromSection = document.getElementById("migrate_from_section");
+  const migrateToSession = document.getElementById("migrate_to_session");
+  const migrateToClass = document.getElementById("migrate_to_class");
+  const migrateToSection = document.getElementById("migrate_to_section");
+  const migrateStudentsListContainer = document.getElementById("migrate_students_list_container");
+  const selectAllMigrate = document.getElementById("selectAllMigrate");
+
+  function populateSections(classEl, sectionEl) {
+    if (!classEl || !sectionEl) return;
+    classEl.addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      sectionEl.innerHTML = '<option value="">-- Select Section --</option>';
+      if (!selectedOption || !selectedOption.value) return;
+
+      try {
+        const sectionsRaw = selectedOption.getAttribute("data-sections");
+        if (sectionsRaw) {
+          const sections = JSON.parse(sectionsRaw);
+          sections.forEach((sec) => {
+            const opt = document.createElement("option");
+            opt.value = sec.id;
+            opt.textContent = sec.name;
+            sectionEl.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing sections JSON", e);
+      }
+    });
+  }
+
+  populateSections(migrateFromClass, migrateFromSection);
+  populateSections(migrateToClass, migrateToSection);
+
+  function loadEligibleStudents() {
+    if (!migrateFromSession || !migrateFromClass || !migrateFromSection || !migrateStudentsListContainer) return;
+    const sessionVal = migrateFromSession.value;
+    const classVal = migrateFromClass.value;
+    const sectionVal = migrateFromSection.value;
+
+    if (!sessionVal || !classVal || !sectionVal) {
+      migrateStudentsListContainer.innerHTML = '<div class="text-xs text-muted text-center p-3">Select From Session, Class, and Section to load students.</div>';
+      if (selectAllMigrate) {
+        selectAllMigrate.checked = false;
+        selectAllMigrate.disabled = true;
+      }
+      return;
+    }
+
+    migrateStudentsListContainer.innerHTML = '<div class="text-xs text-muted text-center p-3"><i class="ph-light ph-spinner-gap ph-spin fs-6"></i> Loading students...</div>';
+
+    fetch(`migrations.php?get_eligible_students=1&session_id=${sessionVal}&class_id=${classVal}&section_id=${sectionVal}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.students && data.students.length > 0) {
+          let html = '<div class="row g-2">';
+          data.students.forEach((student) => {
+            const fullName = `${student.first_name} ${student.last_name}`;
+            const admNo = student.admission_no;
+            const rollNo = student.roll_no ? ` | Roll: ${student.roll_no}` : "";
+            html += `
+              <div class="col-md-6">
+                <div class="form-check text-xs">
+                  <input class="form-check-input student-migrate-checkbox" type="checkbox" name="student_ids[]" value="${student.id}" id="migrate_student_${student.id}">
+                  <label class="form-check-label cursor-pointer" for="migrate_student_${student.id}">
+                    <span class="fw-semibold">${escapeHtml(fullName)}</span>
+                    <span class="text-muted text-xxs">(${admNo}${rollNo})</span>
+                  </label>
+                </div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          migrateStudentsListContainer.innerHTML = html;
+
+          if (selectAllMigrate) {
+            selectAllMigrate.disabled = false;
+            selectAllMigrate.checked = false;
+          }
+
+          // Register change events on individual checkboxes to update Select All check state
+          const studentCheckboxes = migrateStudentsListContainer.querySelectorAll(".student-migrate-checkbox");
+          studentCheckboxes.forEach((cb) => {
+            cb.addEventListener("change", function () {
+              const total = studentCheckboxes.length;
+              const checked = migrateStudentsListContainer.querySelectorAll(".student-migrate-checkbox:checked").length;
+              selectAllMigrate.checked = total === checked;
+            });
+          });
+        } else {
+          migrateStudentsListContainer.innerHTML = '<div class="text-xs text-danger text-center p-3">No active students found in the selected session, class, and section.</div>';
+          if (selectAllMigrate) {
+            selectAllMigrate.checked = false;
+            selectAllMigrate.disabled = true;
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading eligible students:", err);
+        migrateStudentsListContainer.innerHTML = '<div class="text-xs text-danger text-center p-3">Error loading students list.</div>';
+        if (selectAllMigrate) {
+          selectAllMigrate.checked = false;
+          selectAllMigrate.disabled = true;
+        }
+      });
+  }
+
+  if (migrateFromSession) migrateFromSession.addEventListener("change", loadEligibleStudents);
+  if (migrateFromClass) migrateFromClass.addEventListener("change", loadEligibleStudents);
+  if (migrateFromSection) migrateFromSection.addEventListener("change", loadEligibleStudents);
+
+  if (selectAllMigrate) {
+    selectAllMigrate.addEventListener("change", function () {
+      const studentCheckboxes = migrateStudentsListContainer.querySelectorAll(".student-migrate-checkbox");
+      studentCheckboxes.forEach((cb) => {
+        cb.checked = selectAllMigrate.checked;
+      });
+    });
+  }
+
+  // Handle Search for Migrations table
+  const migrationSearchInput = document.getElementById("migrationSearchInput");
+  const migrationsTableBody = document.getElementById("migrationsTableBody");
+  if (migrationSearchInput && migrationsTableBody) {
+    migrationSearchInput.addEventListener("input", function () {
+      const query = migrationSearchInput.value.toLowerCase();
+      const rows = migrationsTableBody.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? "" : "none";
+      });
+    });
+  }
+
+  // View migration details
+  document.querySelectorAll(".view-migration-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const mid = this.getAttribute("data-id");
+      if (!mid) return;
+
+      const tbody = document.getElementById("migrated_students_tbody");
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="ph-light ph-spinner-gap ph-spin fs-5"></i> Loading...</td></tr>';
+      }
+
+      const modalEl = document.getElementById("viewMigrationModal");
+      const viewModal = new bootstrap.Modal(modalEl);
+      viewModal.show();
+
+      fetch(`migrations.php?get_migration_details=1&id=${mid}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && tbody) {
+            if (data.students && data.students.length > 0) {
+              let html = "";
+              data.students.forEach((student, index) => {
+                const fullName = `${student.first_name} ${student.last_name}`;
+                html += `
+                  <tr>
+                    <td><span class="cell-counter">${index + 1}</span></td>
+                    <td><span class="fw-bold">${escapeHtml(student.admission_no)}</span></td>
+                    <td><span>${escapeHtml(student.roll_no || "—")}</span></td>
+                    <td><span class="fw-semibold">${escapeHtml(fullName)}</span> <span class="text-muted">(${escapeHtml(student.u_name)})</span></td>
+                  </tr>
+                `;
+              });
+              tbody.innerHTML = html;
+            } else {
+              tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No students logged in this migration batch.</td></tr>';
+            }
+          } else if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger">${escapeHtml(data.message || "Failed to load details.")}</td></tr>`;
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching migration details:", err);
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-danger">Error loading migration details.</td></tr>';
+          }
+        });
+    });
+  });
+
+  // --- Profile Page Tab Selection and Avatar Preview ---
+  const activeTab = localStorage.getItem('profileActiveTab');
+  if (activeTab) {
+    const tabEl = document.querySelector(`#profileTabs button[data-bs-target="${activeTab}"]`);
+    if (tabEl) {
+      const tabObj = new bootstrap.Tab(tabEl);
+      tabObj.show();
+    }
+  }
+
+  const tabTriggerList = document.querySelectorAll('#profileTabs button[data-bs-toggle="pill"]');
+  tabTriggerList.forEach((tabTriggerEl) => {
+    tabTriggerEl.addEventListener('shown.bs.tab', (event) => {
+      const target = event.target.getAttribute('data-bs-target');
+      localStorage.setItem('profileActiveTab', target);
+    });
+  });
+
+  const avatarInput = document.getElementById('avatar_file_input');
+  if (avatarInput) {
+    avatarInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(ex) {
+          const previewImg = document.getElementById('avatar_preview_img');
+          if (previewImg) {
+            previewImg.src = ex.target.result;
+          }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+  }
+
+  const btnSelectPic = document.getElementById('btn-select-pic');
+  if (btnSelectPic && avatarInput) {
+    btnSelectPic.addEventListener('click', function() {
+      avatarInput.click();
+    });
+  }
+
+  // Flash messages trigger from metadata
+  const profileMeta = document.getElementById('profile-page-data');
+  if (profileMeta) {
+    const flashSuccess = profileMeta.dataset.flashSuccess || "";
+    const flashError = profileMeta.dataset.flashError || "";
+    if (flashSuccess) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: flashSuccess,
+        showConfirmButton: false,
+        timer: 4500,
+        timerProgressBar: true,
+        customClass: { popup: 'swal-toast-custom' }
+      });
+    }
+    if (flashError) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: flashError,
+        confirmButtonColor: '#6366f1',
+        customClass: {
+          confirmButton: 'swal-btn-custom'
+        }
+      });
+    }
+  }
 });
+

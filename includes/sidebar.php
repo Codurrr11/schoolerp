@@ -33,6 +33,7 @@
         $is_bank_accounts = (strpos($current_uri, '/modules/school/bank-accounts/') !== false);
         $is_leads        = (strpos($current_uri, '/modules/school/leads/') !== false);
         $is_admissions   = (strpos($current_uri, '/modules/school/admissions/') !== false);
+        $is_profile      = (strpos($current_uri, '/modules/school/profile/') !== false);
 
         if ($role_name === 'super_admin'):
         ?>
@@ -104,7 +105,7 @@
                 <div class="collapse <?php echo ($is_students) ? 'show' : ''; ?>" id="submenuStudents">
                     <div class="sidebar-submenu">
                         <a href="<?php echo BASE_URL; ?>modules/school/students/index.php" class="submenu-item <?php echo ($is_students && $current_page == 'index.php') ? 'active' : ''; ?>"><i class="ph-light ph-users"></i> All Students</a>
-                        <a href="#" class="submenu-item"><i class="ph-light ph-list-checks"></i> Students Bulk Edit</a>
+                        <a href="<?php echo BASE_URL; ?>modules/school/students/bulk-edit.php" class="submenu-item <?php echo ($is_students && $current_page == 'bulk-edit.php') ? 'active' : ''; ?>"><i class="ph-light ph-list-checks"></i> Students Bulk Edit</a>
                         <a href="<?php echo BASE_URL; ?>modules/school/students/trash.php" class="submenu-item <?php echo ($is_students && $current_page == 'trash.php') ? 'active' : ''; ?>"><i class="ph-light ph-trash"></i> Deleted Students</a>
                         <a href="<?php echo BASE_URL; ?>modules/school/students/passed.php" class="submenu-item <?php echo ($is_students && $current_page == 'passed.php') ? 'active' : ''; ?>"><i class="ph-light ph-student"></i> Passed Students</a>
                         <a href="<?php echo BASE_URL; ?>modules/school/students/dropped.php" class="submenu-item <?php echo ($is_students && $current_page == 'dropped.php') ? 'active' : ''; ?>"><i class="ph-light ph-user-minus"></i> Dropped Students</a>
@@ -593,7 +594,7 @@
             </a>
 
             <!-- 38. Edit Profile -->
-            <a href="#" class="sidebar-nav-item" title="Edit Profile">
+            <a href="<?php echo BASE_URL; ?>modules/school/profile/index.php" class="sidebar-nav-item <?php echo ($is_profile) ? 'active' : ''; ?>" title="Edit Profile">
                 <i class="ph-light ph-user-gear"></i>
                 <span class="nav-label">Edit Profile</span>
             </a>

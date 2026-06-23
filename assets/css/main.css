@@ -7886,5 +7886,173 @@ body.dark-theme .dt-pag-btn.active {
   border-color: var(--color-primary) !important;
 }
 
+/* Student and Migration module utilities */
+.table-search-box input.table-search-input {
+  height: 34px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
 
+.migrate-students-list-container {
+  max-height: 220px;
+}
 
+.th-w-46 {
+  width: 46px;
+}
+
+.th-w-50 {
+  width: 50px;
+}
+
+.th-w-80 {
+  width: 80px;
+}
+
+.th-w-100 {
+  width: 100px;
+}
+
+.th-w-120 {
+  width: 120px;
+}
+
+/* Modal Body Header Overrides & Consistent Form Layout Styles */
+.modal-body h6.text-success {
+  font-size: 11.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: var(--color-green) !important;
+  border-left: 3px solid var(--color-green) !important;
+  padding-left: 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 14px !important;
+  border-bottom: none !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+  display: block !important;
+  border-radius: 0 !important;
+}
+
+.modal-body h6.text-secondary {
+  font-size: 11.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: var(--color-text-secondary) !important;
+  border-left: 3px solid var(--color-text-secondary) !important;
+  padding-left: 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 14px !important;
+  border-bottom: none !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+  display: flex !important;
+  border-radius: 0 !important;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.whatsapp-link {
+  color: #22c55e !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+}
+.whatsapp-link:hover {
+  color: #16a34a !important;
+  text-decoration: underline !important;
+}
+
+/* Compact Table Form Controls for Bulk Edit */
+.table-premium input.form-control-table,
+.table-premium select.form-control-table {
+  padding: 4px 8px !important;
+  font-size: 11.5px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  border: 1px solid var(--color-border) !important;
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-text-primary) !important;
+  width: 100%;
+  outline: none;
+  font-family: var(--font-primary);
+  transition: var(--transition);
+}
+.table-premium input.form-control-table:focus,
+.table-premium select.form-control-table:focus {
+  border-color: var(--color-accent) !important;
+  background-color: var(--color-surface) !important;
+}
+body.dark-theme .table-premium input.form-control-table,
+body.dark-theme .table-premium select.form-control-table {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+  border-color: var(--color-border) !important;
+}
+body.dark-theme .table-premium input.form-control-table:focus,
+body.dark-theme .table-premium select.form-control-table:focus {
+  background-color: var(--color-surface) !important;
+}
+
+.form-control-table-xs {
+  width: 80px !important;
+  min-width: 80px !important;
+}
+.form-control-table-sm {
+  width: 120px !important;
+  min-width: 120px !important;
+}
+.form-control-table-md {
+  width: 170px !important;
+  min-width: 170px !important;
+}
+.form-control-table-lg {
+  width: 230px !important;
+  min-width: 230px !important;
+}
+
+/* My Profile Custom Sidebar Nav-Pills Styling */
+.profile-tabs-nav .nav-link {
+  text-align: left;
+  border-radius: 0 !important;
+  padding: 14px 20px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #0096ff !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+}
+.profile-tabs-nav .nav-link:last-child {
+  border-bottom: none !important;
+}
+.profile-tabs-nav .nav-link:hover {
+  background: rgba(0, 150, 255, 0.05) !important;
+}
+.profile-tabs-nav .nav-link.active {
+  background: #0096ff !important;
+  color: #fff !important;
+}
+.profile-tabs-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #0096ff;
+  z-index: 10;
+}
+body.dark-theme .profile-tabs-nav .nav-link {
+  border-color: var(--color-border) !important;
+}
+body.dark-theme .profile-tabs-nav .nav-link:hover {
+  background: rgba(0, 150, 255, 0.1) !important;
+}
+body.dark-theme .profile-tabs-nav .nav-link.active {
+  background: #0096ff !important;
+  color: #fff !important;
+}

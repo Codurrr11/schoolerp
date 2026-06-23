@@ -1,6 +1,6 @@
 **Task:** Create new Page for the tab in sidebar -
-Students as shown in first attached image.
-: **[Passed Students , Dropped Students ,  Suspended Students  , Migrations]**
+Edit Profile:
+: **[edit profile]**
 
 we need to r
 
