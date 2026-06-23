@@ -9,7 +9,8 @@ prompts/
 scratch/
 
 # Uploads
-uploads/
+uploads/*
+!uploads/.gitkeep
 
 # Environment files
 .env
